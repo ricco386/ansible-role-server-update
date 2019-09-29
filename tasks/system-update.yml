@@ -1,0 +1,36 @@
+---
+- name: Update (Populate) the package database. (SmartOS)
+  pkgin: update_cache=yes
+  become: true
+  when: ansible_distribution == "SmartOS"
+  tags:
+    - update
+
+- name: Upgrade all packages to their latest versions. (SmartOS)
+  pkgin: full_upgrade=yes
+  become: true
+  when: ansible_distribution == "SmartOS"
+  tags:
+    - update
+
+- name: Upgrade all packages to their latest versions with YUM. (old CentOS/RedHat/Fedora)
+  yum: name=* state=latest
+  become: true
+  when: ((ansible_distribution == "CentOS" or ansible_distribution == 'RedHat') and ansible_distribution_major_version|int <= 7) or (ansible_distribution == 'Fedora' and ansible_distribution_major_version|int <= 21)
+  tags:
+    - update
+
+- name: Upgrade all packages to their latest versions with DNF. (CentOS/RedHat/Fedora)
+  dnf: name=* state=latest
+  become: true
+  when: ((ansible_distribution == "CentOS" or ansible_distribution == 'RedHat') and ansible_distribution_major_version|int >= 8) or (ansible_distribution == "Fedora" and ansible_distribution_major_version|int >= 22)
+  tags:
+    - update
+
+- name: Upgrade all packages to their latest versions with APT. (Debian/Ubuntu/Raspbian)
+  apt: name=* state=latest
+  become: true
+  when: ansible_os_family == 'Debian'
+  tags:
+    - update
+
